@@ -20,20 +20,26 @@ from launch_ros.actions import ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
 
 
+camera_node_name = 'luci_1_d435i'  # 'camera'
+camera_node_namespace = 'experiment/luci_1'  # ''
+
+
 def generate_launch_description():
     """Launch file which brings up visual slam node configured for RealSense."""
     realsense_camera_node = Node(
-        name='camera',
-        namespace='',  # 'camera',
+        name=camera_node_name,  # 'camera',
+        namespace=camera_node_namespace,  # '',  # 'camera',
         package='realsense2_camera',
         executable='realsense2_camera_node',
         parameters=[{
             'enable_infra1': True,
             'enable_infra2': True,
-            'enable_color': False,
+            'enable_color': True,
             'enable_depth': False,
             'depth_module.emitter_enabled': 0,
             'depth_module.infra_profile': '640x480x30',
+            # 'depth_module.infra_profile': '480x270x60',
+            'rgb_camera.color_profile': '640x480x15',
             'enable_gyro': True,
             'enable_accel': True,
             'gyro_fps': 200,
@@ -49,7 +55,8 @@ def generate_launch_description():
         parameters=[{
             'enable_image_denoising': False,
             'rectified_images': True,
-            'enable_imu_fusion': True,
+            # 'enable_ground_constraint_in_odometry': True, 
+            'enable_imu_fusion': False,
             'gyro_noise_density': 0.000244,
             'gyro_random_walk': 0.000019393,
             'accel_noise_density': 0.001862,
@@ -67,11 +74,11 @@ def generate_launch_description():
             ],
         }],
         remappings=[
-            ('visual_slam/image_0', 'camera/infra1/image_rect_raw'),
-            ('visual_slam/camera_info_0', 'camera/infra1/camera_info'),
-            ('visual_slam/image_1', 'camera/infra2/image_rect_raw'),
-            ('visual_slam/camera_info_1', 'camera/infra2/camera_info'),
-            ('visual_slam/imu', 'camera/imu'),
+            ('visual_slam/image_0', f'{camera_node_namespace}/{camera_node_name}/infra1/image_rect_raw'),
+            ('visual_slam/camera_info_0', f'{camera_node_namespace}/{camera_node_name}/infra1/camera_info'),
+            ('visual_slam/image_1', f'{camera_node_namespace}/{camera_node_name}/infra2/image_rect_raw'),
+            ('visual_slam/camera_info_1', f'{camera_node_namespace}/{camera_node_name}/infra2/camera_info'),
+            ('visual_slam/imu', f'{camera_node_namespace}/{camera_node_name}/imu'),
         ],
     )
 
@@ -84,4 +91,7 @@ def generate_launch_description():
         output='screen',
     )
 
-    return launch.LaunchDescription([visual_slam_launch_container, realsense_camera_node])
+    return launch.LaunchDescription([
+        visual_slam_launch_container, 
+        realsense_camera_node
+        ])
