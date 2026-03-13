@@ -42,8 +42,8 @@ def generate_launch_description():
             'rgb_camera.color_profile': '640x480x15',
             'enable_gyro': True,
             'enable_accel': True,
-            'gyro_fps': 200,
-            'accel_fps': 200,
+            'gyro_fps': 400, # 200,
+            'accel_fps': 250,  # 200,
             'unite_imu_method': 2
         }],
     )
@@ -56,7 +56,7 @@ def generate_launch_description():
             'enable_image_denoising': False,
             'rectified_images': True,
             # 'enable_ground_constraint_in_odometry': True, 
-            'enable_imu_fusion': False,
+            'enable_imu_fusion': True,
             'gyro_noise_density': 0.000244,
             'gyro_random_walk': 0.000019393,
             'accel_noise_density': 0.001862,
