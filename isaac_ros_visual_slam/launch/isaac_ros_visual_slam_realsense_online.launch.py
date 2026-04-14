@@ -21,7 +21,7 @@ from launch_ros.descriptions import ComposableNode
 
 
 camera_node_name = 'luci_1_d435i'  # 'camera'
-camera_node_namespace = 'experiment/luci_1'  # ''
+camera_node_namespace = 'experiment/luci_1/luci_1_d435i'  # ''
 
 
 def generate_launch_description():
@@ -36,6 +36,7 @@ def generate_launch_description():
             'enable_infra2': True,
             'enable_color': True,
             'enable_depth': False,
+            'pointcloud.enable': False, 
             'depth_module.emitter_enabled': 0,
             'depth_module.profile': '640x480x30',
             # 'depth_module.infra_profile': '480x270x60',
@@ -74,11 +75,11 @@ def generate_launch_description():
             ],
         }],
         remappings=[
-            ('visual_slam/image_0', f'{camera_node_namespace}/{camera_node_name}/infra1/image_rect_raw'),
-            ('visual_slam/camera_info_0', f'{camera_node_namespace}/{camera_node_name}/infra1/camera_info'),
-            ('visual_slam/image_1', f'{camera_node_namespace}/{camera_node_name}/infra2/image_rect_raw'),
-            ('visual_slam/camera_info_1', f'{camera_node_namespace}/{camera_node_name}/infra2/camera_info'),
-            ('visual_slam/imu', f'{camera_node_namespace}/{camera_node_name}/imu'),
+            ('visual_slam/image_0', f'{camera_node_namespace}/infra1/image_rect_raw'),
+            ('visual_slam/camera_info_0', f'{camera_node_namespace}/infra1/camera_info'),
+            ('visual_slam/image_1', f'{camera_node_namespace}/infra2/image_rect_raw'),
+            ('visual_slam/camera_info_1', f'{camera_node_namespace}/infra2/camera_info'),
+            ('visual_slam/imu', f'{camera_node_namespace}/imu'),
         ],
     )
 
