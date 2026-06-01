@@ -15,6 +15,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import subprocess
 import launch
 from launch_ros.actions import ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
@@ -25,25 +26,24 @@ camera_node_namespace = 'experiment/luci_1/luci_1_d435i'  # ''
 def detect_accel_fps():
     """ dynamically queries the RealSense hardware to find the supported accelerometer FPS """
     try:
-        import pyrealsense2 as rs
-        # Fix for Jetson/ARM source builds where bindings are nested in a sub-module folder
-        if not hasattr(rs, 'context'):
-            import pyrealsense2.pyrealsense2 as rs
-
-        ctx = rs.context()
-        devices = ctx.query_devices()
-        if devices:
-            # Query first-available device
-            for sensor in devices[0].query_sensors():
-                if sensor.is_motion_sensor():
-                    for profile in sensor.get_stream_profiles():
-                        if profile.stream_type() == rs.stream.accel:
-                            fps = profile.fps()
-                            if fps in [200, 250]:
-                                return fps
+        res = subprocess.run(
+            ['rs-enumerate-devices'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=3.0
+        )
+        if res.returncode == 0:
+            # Split the entire console output into separate lines
+            for line in res.stdout.splitlines():
+                # Focus strictly on lines detailing the Accelerometer stream
+                if "Accel" in line:
+                    if "250" in line:
+                        return 250
+                    elif "200" in line:
+                        return 200
     except Exception as e:
-        print(f"[Launch Warning] Could not auto-detect RealSense IMU via pyrealsense2: {e}")
-
+        print(f"[Launch Warning] Could not auto-detect RealSense IMU via rs-enumerate-devices: {e}")
     # Return default if auto-detect fails
     return 250
 
@@ -89,7 +89,7 @@ def generate_launch_description():
             'gyro_random_walk': 0.000019393,
             'accel_noise_density': 0.001862,
             'accel_random_walk': 0.003,
-            'calibration_frequency': 200.0,
+            'calibration_frequency': float(accel_fps_val), # automatically sync with slowest IMU readout
             'image_jitter_threshold_ms': 22.00,
             'base_frame': 'camera_link',
             'imu_frame': 'camera_gyro_optical_frame',
