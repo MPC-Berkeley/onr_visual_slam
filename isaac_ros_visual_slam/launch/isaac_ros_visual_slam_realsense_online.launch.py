@@ -19,13 +19,36 @@ import launch
 from launch_ros.actions import ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
 
-
 camera_node_name = 'luci_1_d435i'  # 'camera'
 camera_node_namespace = 'experiment/luci_1/luci_1_d435i'  # ''
 
+def detect_accel_fps():
+    """ dynamically queries the RealSense hardware to find the supported accelerometer FPS """
+    try:
+        import pyrealsense2 as rs
+        ctx = rs.context()
+        devices = ctx.query_devices()
+        if devices:
+            # Query first-available device
+            for sensor in devices[0].query_sensors():
+                if sensor.is_motion_sensor():
+                    for profile in sensor.get_stream_profiles():
+                        if profile.stream_type() == rs.stream.accel:
+                            fps = profile.fps()
+                            if fps in [200, 250]:
+                                return fps
+    except Exception as e:
+        print(f"[Launch Warning] Could not auto-detect RealSense IMU via pyrealsense2: {e}")
+
+    # Return default if auto-detect fails
+    return 250
 
 def generate_launch_description():
     """Launch file which brings up visual slam node configured for RealSense."""
+    # Detect the correct hardware rate
+    accel_fps_val = detect_accel_fps()
+    print(f"[Launch Info] Automatically selected 'accel_fps': {accel_fps_val}")
+
     realsense_camera_node = Node(
         name=camera_node_name,  # 'camera',
         namespace=camera_node_namespace,  # '',  # 'camera',
@@ -44,7 +67,7 @@ def generate_launch_description():
             'enable_gyro': True,
             'enable_accel': True,
             'gyro_fps': 400, # 200,
-            'accel_fps': 250,  # 200,
+            'accel_fps': accel_fps_val,  # [63/250] or [100/200] depending on IMU chip
             'unite_imu_method': 2
         }],
     )
