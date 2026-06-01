@@ -26,6 +26,10 @@ def detect_accel_fps():
     """ dynamically queries the RealSense hardware to find the supported accelerometer FPS """
     try:
         import pyrealsense2 as rs
+        # Fix for Jetson/ARM source builds where bindings are nested in a sub-module folder
+        if not hasattr(rs, 'context'):
+            import pyrealsense2.pyrealsense2 as rs
+
         ctx = rs.context()
         devices = ctx.query_devices()
         if devices:
