@@ -75,8 +75,8 @@ def generate_launch_description():
             'gyro_fps': gyro_fps,
             'accel_fps': accel_fps,
             'unite_imu_method': 2,
-            'camera_namespace': BASE_NAMESPACE,
-            'camera_name': CAMERA_NAME,
+            'camera_namespace': f'{BASE_NAMESPACE}/{CAMERA_NAME}',
+            # 'camera_name': CAMERA_NAME,
         }],
     )
 
