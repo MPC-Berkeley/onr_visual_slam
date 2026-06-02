@@ -57,7 +57,7 @@ def generate_launch_description():
 
     realsense_camera_node = Node(
         name=CAMERA_NAME,  # 'camera',
-        namespace=BASE_NAMESPACE,  # '',  # 'camera'
+        namespace=f'{BASE_NAMESPACE}/{CAMERA_NAME}',  # '',  # 'camera'
         package='realsense2_camera',
         executable='realsense2_camera_node',
         parameters=[{
@@ -75,7 +75,7 @@ def generate_launch_description():
             'gyro_fps': gyro_fps,
             'accel_fps': accel_fps,
             'unite_imu_method': 2,
-            'camera_namespace': f'{BASE_NAMESPACE}/{CAMERA_NAME}',
+            # 'camera_namespace': f'{BASE_NAMESPACE}/{CAMERA_NAME}',
             # 'camera_name': CAMERA_NAME,
         }],
     )
