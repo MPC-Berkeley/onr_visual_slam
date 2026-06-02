@@ -74,12 +74,14 @@ def generate_launch_description():
             'enable_accel': True,
             'gyro_fps': gyro_fps,
             'accel_fps': accel_fps,
-            'unite_imu_method': 2
+            'unite_imu_method': 2,
+            'camera_namespace': BASE_NAMESPACE,
         }],
     )
 
     visual_slam_node = ComposableNode(
         name='visual_slam_node',
+        namespace=BASE_NAMESPACE,
         package='isaac_ros_visual_slam',
         plugin='nvidia::isaac_ros::visual_slam::VisualSlamNode',
         parameters=[{
