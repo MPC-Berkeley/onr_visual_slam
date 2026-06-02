@@ -76,6 +76,7 @@ def generate_launch_description():
             'accel_fps': accel_fps,
             'unite_imu_method': 2,
             'camera_namespace': BASE_NAMESPACE,
+            'camera_name': CAMERA_NAME,
         }],
     )
 
